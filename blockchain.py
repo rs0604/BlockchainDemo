@@ -64,3 +64,31 @@ class Blockchain(object) :
     def last_block(self):
         return self.chain[-1]
 
+    def proof_of_work(self, last_proof):
+        """
+        シンプルなプルーフ・オブ・ワークのアルゴリズム:
+         - hash(pp') の最初の4つが0となるような p' を探す
+         - p は1つ前のブロックのプルーフ、p'は新しいブロックのプルーフ
+        :param last_proof: <int>
+        :return: <int>
+        """
+
+        proof = 0
+        while self.valid_proof(last_proof, proof) is False:
+            proof += 1
+
+        return proof
+
+    @staticmethod
+    def valid_proof(last_proof, proof):
+        """
+        プルーフが正しいか確認する: hash(last_proof, proof)の最初の4つが0となっているか？
+        :param last_proof: <int> 前のプルーフ
+        :param proof: <int> 現在のプルーフ
+        :return: <bool> 正しければ true
+        """
+
+        guess = f'{last_proof}{proof}'.encode()
+        guess_hash = hashlib_sha256(guess).hexdigest()
+
+        return guess_hash[:4] == "0000"
