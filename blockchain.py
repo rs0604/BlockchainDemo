@@ -54,6 +54,5 @@ class Blockchain(object) :
 
     @property
     def last_block(self):
-        # チェーンの最後のブロックをリターンする
-        pass
+        return self.chain[-1]
 
