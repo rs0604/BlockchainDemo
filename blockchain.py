@@ -49,8 +49,16 @@ class Blockchain(object) :
 
     @staticmethod
     def hash(block):
-        # ブロックをハッシュ化する
-        pass
+        """
+        ブロックの SHA-256 ハッシュを作る
+        :param block: <dict> ブロック
+        :return: <str>
+        """
+
+        # 必ずDictionaryがソートされている必要がある。
+        # そうでないと、一貫性のないハッシュとなってしまう。
+        block_string = json.dumps(block, sort_keys=True).encode()
+        return hashlib.sha256(block_string).hexdigest()
 
     @property
     def last_block(self):
