@@ -100,3 +100,41 @@ class Blockchain(object) :
         guess_hash = hashlib_sha256(guess).hexdigest()
 
         return guess_hash[:4] == "0000"
+
+
+    # ------------------------------------------------
+    # 以下、ローカルマシンにトランザクションエンドポイントを生成する処理
+    # ------------------------------------------------
+
+    # ノード作成
+    # Flaskの詳細 http://flask.pocoo.org/docs/0.12/quickstart/#a-minimal-application
+    app = Flask(__name__)
+
+    # このノードのグローバルにユニークなアドレスを作る
+    node_identifier = str(uuid4()).replace('-', '')
+
+    # ブロックチェーンクラスをインスタンス化する
+    blockchain = Blockchain()
+
+    # メソッドはPOSTで/transactions/new エンドポイントを作る。POSTなので、データを送信する
+    @app.route('/transactions/new', methods=['POST'])
+    def new_transactions():
+        return '新しいトランザクションを追加します'
+
+    # メソッドはGETで/mineエンドポイントを作る
+    @app.route('/mine', methods=['GET'])
+    def mine():
+        return '新しいブロックを採掘します'
+
+    # メソッドはGETで、フルのブロックチェーンをリターンする/chainエンドポイントを作る
+    @app.route('/chain', methods=['GET'])
+    def full_chain():
+        response = {
+            'chain': blockchain.chain,
+            'length': len(blockchain.chain),
+        }
+        return jsonify(response), 200
+
+    # port5000でサーバーを起動する
+    if __name__ == '__main__':
+        app.run(host = '0.0.0.0', port = 5000)
