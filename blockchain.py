@@ -5,9 +5,30 @@ class Blockchain(object) :
         self.chain = []
         self.current_transactions = []
 
+        # ジェネシスブロックを作る
+        self.new_block(previous_hash=1, proof=100)
+
     def new_block(self):
-        # 新しいブロックを作り、チェーンに加える
-        pass
+        """
+        ブロックチェーンに新しいブロックを作る
+        :param proof: <int> プルーフ・オブ・ワークアルゴリズムから得られるプルーフ
+        :param previous_hash: オプション <str> 前のブロックのハッシュ
+        :return: <dict> 新しいブロック
+        """
+
+        block = {
+            'index': len(self.chain) + 1,
+            'timestamp': time(),
+            'transactions': self.current_transactions,
+            'proof': proof,
+            'previous_hash': previous_hash or self.hash(self.chain[-1]),
+        }
+
+        # 現在のトランザクションリストをリセット
+        self.current_transactions = []
+
+        self.chain.append(block)
+        return block
 
     def new_transaction(self, sender, recipient, amount):
         """
