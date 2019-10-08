@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import requests
 from textwrap import dedent
 from time import time
 from uuid import uuid4
