@@ -241,6 +241,42 @@ def full_chain():
     }
     return jsonify(response), 200
 
+# NW上にノードを追加する
+@app.route('/nodes/register', methods=['POST'])
+def register_node():
+    values = request.get_json()
+
+    nodes = values.get('nodes')
+    if nodes is None:
+        return "Error: 無効なノードリスト", 400
+
+    for node in nodes:
+        blockchain.register_node(node)
+
+    response = {
+        'message': '新しいノードが追加されました',
+        'total_nodes': list(blockchain.nodes),
+    }
+    return jsonify(response), 201
+
+# コンセンサスを行う
+@app.route('/nodes/resolve', methods=['GET'])
+def consensus():
+    replaced = blockchain.resolve_conflicts()
+
+    if replaced:
+        response = {
+            'message': 'チェーンが置き換えられました',
+            'new_chain': blockchain.chain
+        }
+    else:
+        response = {
+            'message': 'チェーンが確認されました',
+            'chain': blockchain.chain
+        }
+
+    return jsonify(response), 200
+
 # port5000でサーバーを起動する
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = 5000)
