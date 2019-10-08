@@ -247,6 +247,9 @@ def full_chain():
 def register_node():
     values = request.get_json()
 
+    if values is None:
+        return "Error: 無効なパラメータ"
+
     nodes = values.get('nodes')
     if nodes is None:
         return "Error: 無効なノードリスト", 400
