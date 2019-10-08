@@ -142,7 +142,7 @@ class Blockchain(object):
 
         return True
 
-    def resolve_conflicts(sef):
+    def resolve_conflicts(self):
         """
         コンセンサスアルゴリズムの実体。
         ネットワーク上の最も長いチェーンで自らのチェーンを置き換えることでコンフリクトを解消する。
