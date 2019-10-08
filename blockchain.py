@@ -113,6 +113,65 @@ class Blockchain(object):
         parsed_url = urlparse(address)
         self.nodes.add(parsed_url.netloc)
 
+    def valid_chain(self, chain):
+        """
+        ブロックチェーンが正しいか確認する
+        :param chain: <list> ブロックチェーン
+        :return: <bool> 正しいかどうか
+        """
+        last_block = chain[0]
+        current_index = 1
+
+        while current_index < len(chain):
+            block = chain[current_index]
+            print(f'{last_block}')
+            print(f'{block}')
+            print("\n--------------\n")
+
+            # ブロックのハッシュ検証
+            if block['previous_hash'] != self.hash(last_block):
+                return False
+
+            # PoWの検証
+            if not self.valid_proof(last_block['proof'], block['proof']):
+                return False
+
+            last_block = block
+            current_index += 1
+
+        return True
+
+    def resolve_conflicts(sef):
+        """
+        コンセンサスアルゴリズムの実体。
+        ネットワーク上の最も長いチェーンで自らのチェーンを置き換えることでコンフリクトを解消する。
+        :return: <bool> 自らのチェーンが置き換えられるとTrue
+        """
+        neighbours = self.nodes
+        new_chain = None
+
+        # 自らのより長いチェーンを探す
+        max_length = len(self.chain)
+
+        # 他のすべてのノードのチェーンを確認
+        for node in neighbours:
+            response = requests.get(f'http://{node}/chain')
+
+            if response.status_code == 200:
+                length = response.json()['length']
+                chain = response.json()['chain']
+
+                # そのチェーンがより長いか、有効かを確認
+                if length > max_length and self.valid_chain(chain):
+                    max_length = length
+                    new_chain = chain
+
+        # もし自らのより長く有効なチェーンを見つけた場合、それで置換
+        if new_chain:
+            self.chain = new_chain
+            return True
+
+        return False
 
 # ------------------------------------------------
 # 以下、ローカルマシンにトランザクションエンドポイントを生成する処理
